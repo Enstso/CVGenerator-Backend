@@ -6,10 +6,12 @@ const apiRouter = require('./routes');
 const cors = require('cors');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
+const cookieParser = require('cookie-parser');
 
 app.use(cors());
 
 app.use(express.json());
+app.use(cookieParser());
 
 const swaggerOptions = {
     swaggerDefinition: {
