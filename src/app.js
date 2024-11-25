@@ -8,8 +8,10 @@ const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 const cookieParser = require('cookie-parser');
 
-app.use(cors());
-
+app.use(cors({
+    origin: 'http://localhost:5174', // Specific origin
+    credentials: true // Allow cookies or credentials
+}));
 app.use(express.json());
 app.use(cookieParser());
 

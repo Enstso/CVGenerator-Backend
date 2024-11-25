@@ -43,6 +43,7 @@ UserSchema.statics.verifyLogin = async function (email, password) {
             return { success: false, message: 'User not found.' };
         }
 
+        
         // Vérification du mot de passe
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
@@ -55,6 +56,26 @@ UserSchema.statics.verifyLogin = async function (email, password) {
         return { success: false, message: error.message };
     }
 };
+
+UserSchema.statics.checkUserExists =  async function (email, username) {
+    try {
+        const existingUser = await this.findOne({
+            $or: [{ email: email }, { username: username }]
+        });
+
+        if (existingUser) {
+            console.log("User already exists:", existingUser);
+            return true; // L'utilisateur existe déjà
+        } else {
+            console.log("User does not exist.");
+            return false; // L'utilisateur n'existe pas
+        }
+    } catch (error) {
+        console.error("Error checking user:", error);
+        throw error;
+    }
+}
+
 
 // Modèle basé sur le schéma
 const User = mongoose.model('User', UserSchema);

@@ -1,5 +1,5 @@
 const { Validator } = require('jsonschema');
-const db = require('../models'); // Adaptez pour votre système de gestion des modèles (ex: Sequelize, Mongoose)
+const UserModel = require('../models/User'); 
 
 module.exports = {
     register: async (user) => {
@@ -37,12 +37,11 @@ module.exports = {
                     pattern: '^(?=.*[A-Z])(?=.*[0-9]).+$'
                 }
             },
-            required: ['firstname', 'lastname', 'email', 'password']
+            required: ['username','firstname', 'lastname', 'email', 'password']
         };
 
         // Validation de la structure JSON
         const result = validator.validate(user, userSchema);
-
         if (Array.isArray(result.errors) && result.errors.length) {
             let failedInputs = result.errors
                 .map(error => error.schema?.errorMessage || error.message)
@@ -54,22 +53,13 @@ module.exports = {
         }
 
         // Vérifier si l'utilisateur existe déjà (par email ou username)
-        const existingUser = await db.User.findOne({ 
-            where: { 
-                [db.Sequelize.Op.or]: [
-                    { email: user.email }, 
-                    { username: user.username }
-                ] 
-            } 
-        });
-
+        const existingUser = await UserModel.checkUserExists(user.email,user.username);
         if (existingUser) {
             return {
                 success: false,
                 message: 'User already exists with the provided email or username'
             };
         }
-
         // Validation réussie
         return { success: true };
     }

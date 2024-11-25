@@ -39,7 +39,7 @@ module.exports = {
 
     getAllPublicCvs: async (req, res) => {
         try {
-            const cvs = await CvModel.find({ visibility: 'public' }).populate('user', 'firstName lastName email');
+            const cvs = await CvModel.find({ visibility: 'public' }).populate('user', 'firstname lastname email');
 
             res.status(200).send({
                 success: true,

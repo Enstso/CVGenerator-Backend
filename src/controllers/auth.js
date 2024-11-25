@@ -1,5 +1,5 @@
 const UserModel = require("../models/User");
-const { verifyUser } = require("../validator/user");
+const { register } = require("../validator/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -7,9 +7,9 @@ module.exports = {
   register: async (req, res) => {
     try {
       const newUser = req.body;
-      const isNotValidateUser = verifyUser(newUser);
-
-      if (isNotValidateUser) {
+      const isNotValidateUser = await register(newUser);
+      console.log(isNotValidateUser);
+      if (!isNotValidateUser.success) {
         return res.status(400).send({
           error: isNotValidateUser.message,
         });
@@ -17,11 +17,11 @@ module.exports = {
 
       newUser.password = await bcrypt.hash(newUser.password, 10);
       await UserModel.create(newUser);
-
-      return res.status(201).end();
+      console.log('ff');
+      return res.status(201).send();
     } catch (error) {
       return res.status(500).send({
-        message: error.message || "Some error occurred while registering user",
+        message: "Some error occurred while registering user",
       });
     }
   },
@@ -29,8 +29,9 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-      const result = await User.verifyLogin(email, password);
-
+      console.log(email,password)
+      const result = await UserModel.verifyLogin(email, password);
+      console.log(result);
       if (!result.success) {
         return res.status(401).send({ error: result.message });
       }
@@ -53,7 +54,7 @@ module.exports = {
       });
     } catch (error) {
       res.status(500).send({
-        message: error.message || "Some error occurred while logging user",
+        message: "Some error occurred while logging user",
       });
     }
   },
@@ -70,7 +71,7 @@ module.exports = {
       });
     } catch (error) {
       return res.status(500).send({
-        message: error.message || "An error occurred while logging out.",
+        message: "An error occurred while logging out.",
       });
     }
   },
