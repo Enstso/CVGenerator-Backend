@@ -1,5 +1,5 @@
-const router = require('express').Router();
-const authController = require ('../controllers/auth')
+const router = require("express").Router();
+const authController = require("../controllers/auth");
 
 /**
  * @swagger
@@ -75,7 +75,7 @@ const authController = require ('../controllers/auth')
  *       500:
  *         description: Internal server error.
  */
-router.post('/register', authController.register);
+router.post("/register", authController.register);
 
 /**
  * @swagger
@@ -141,6 +141,8 @@ router.post('/register', authController.register);
  *       500:
  *         description: Internal server error.
  */
-router.post('/login', authController.login);
+router.post("/login", authController.login);
+
+router.get("/logout", authController.logout);
 
 module.exports = router;
