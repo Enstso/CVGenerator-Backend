@@ -2,6 +2,7 @@ const UserModel = require('../models/User');
 const bcrypt = require('bcrypt');
 
 module.exports = {
+
     getMyInfos: async (req,res) => {
         try {
             const { id, firstName, lastName, email } = req.user;
@@ -17,6 +18,7 @@ module.exports = {
         })
         }
     },
+    
     updateMyInfos: async (req,res) => {
         try {
             const { firstName, lastName, email } = req.body;

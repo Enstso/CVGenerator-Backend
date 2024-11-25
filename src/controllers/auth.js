@@ -4,20 +4,18 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 module.exports = {
+
   register: async (req, res) => {
     try {
       const newUser = req.body;
       const isNotValidateUser = await register(newUser);
-      console.log(isNotValidateUser);
       if (!isNotValidateUser.success) {
         return res.status(400).send({
           error: isNotValidateUser.message,
         });
       }
-
       newUser.password = await bcrypt.hash(newUser.password, 10);
       await UserModel.create(newUser);
-      console.log('ff');
       return res.status(201).send();
     } catch (error) {
       return res.status(500).send({
@@ -29,26 +27,21 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-      console.log(email,password)
       const result = await UserModel.verifyLogin(email, password);
-      console.log(result);
       if (!result.success) {
         return res.status(401).send({ error: result.message });
       }
-
       const secret = process.env.JWT_SECRET || "secret";
       const jwtData = {
         expiresIn: process.env.JWT_TIMEOUT_DURATION || "1h",
       };
       const token = jwt.sign({ email }, secret, jwtData);
-
       res.cookie("jwt", token, {
         httpOnly: true,
         secure: true,
         sameSite: "Strict",
         maxAge: 3600000,
       });
-
       return res.status(200).send({
         message: "Login successful.",
       });
@@ -74,5 +67,5 @@ module.exports = {
         message: "An error occurred while logging out.",
       });
     }
-  },
+  }
 };
