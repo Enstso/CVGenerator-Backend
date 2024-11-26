@@ -2,7 +2,7 @@ const { verifyCV } = require('../validator/cv');
 const CvModel = require('../models/CV');
 
 module.exports = {
-    createCV: async (req, res) => {
+    createCV: async (req,res) => {
         try {
             
             const isNotValid = verifyCV(req.body);
@@ -56,7 +56,7 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            const cv = await CvModel.findById(id).populate('user', 'firstName lastName email');
+            const cv = await CvModel.findById(id).populate('user', 'firstname lastname email');
 
             if (!cv) {
                 return res.status(404).send({

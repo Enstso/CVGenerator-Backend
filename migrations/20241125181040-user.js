@@ -1,7 +1,7 @@
 module.exports = {
   async up(db, client) {
     // 1. Create 'user' collection
-    await db.createCollection("user", {
+    await db.createCollection("users", {
       validator: {
         $jsonSchema: {
           bsonType: "object",
@@ -19,7 +19,7 @@ module.exports = {
     console.log("Collection 'user' created with validation.");
 
     // 2. Create 'cv' collection
-    await db.createCollection("cv", {
+    await db.createCollection("cvs", {
       validator: {
         $jsonSchema: {
           bsonType: "object",
@@ -33,7 +33,7 @@ module.exports = {
               bsonType: "string",
               description: "The title of the CV and is required.",
             },
-            summmary: {
+            summary: {
               bsonType: "string",
               description: "Summary of the CV, optional.",
             },
@@ -93,7 +93,7 @@ module.exports = {
     console.log("Collection 'cv' created with validation.");
 
     // 3. Create 'recommendation' collection (depends on 'user' and 'cv' collections)
-    await db.createCollection("recommendation", {
+    await db.createCollection("recommendations", {
       validator: {
         $jsonSchema: {
           bsonType: "object",
@@ -114,13 +114,13 @@ module.exports = {
 
   async down(db, client) {
     // 1. Drop 'recommendation' collection first (since it depends on 'user' and 'cv')
-    await db.collection("recommendation").drop();
+    await db.collection("recommendations").drop();
 
     // 2. Drop 'cv' collection
-    await db.collection("cv").drop();
+    await db.collection("cvs").drop();
 
     // 3. Drop 'user' collection last
-    await db.collection("user").drop();
+    await db.collection("users").drop();
 
     console.log("Collections 'user', 'cv', and 'recommendation' dropped.");
   },

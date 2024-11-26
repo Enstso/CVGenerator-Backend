@@ -9,7 +9,7 @@ const swaggerUI = require('swagger-ui-express');
 const cookieParser = require('cookie-parser');
 
 app.use(cors({
-    origin: 'http://localhost:5174', // Specific origin
+    origin: 'http://localhost:5173', // Specific origin
     credentials: true // Allow cookies or credentials
 }));
 app.use(express.json());
