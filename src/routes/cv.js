@@ -174,7 +174,8 @@ router.put('/:id', verifyToken, cvController.updateCV);
  *       500:
  *         description: Internal server error.
  */
-router.delete('/:id', verifyToken, cvController.deleteCV);
+router.delete('/', verifyToken, cvController.deleteCV);
 
+router.get('/myCvs')
 module.exports = router;
 

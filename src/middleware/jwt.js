@@ -4,17 +4,17 @@ const UserModel = require('../models/User');
 module.exports = {
     verifyToken: async (req, res, next) => {
         try {
-            // Vérification de l'existence de l'en-tête Authorization
-            const authHeader = req.headers['authorization'];
-            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            console.log(req.headers);
+
+            // Vérification de l'existence du cookie contenant le JWT
+            const token = req.cookies?.jwt; // Utilisation de req.cookies.jwt si express-cookie-parser est utilisé
+
+            if (!token) {
                 return res.status(401).send({
                     success: false,
-                    message: 'No token provided or malformed authorization header',
+                    message: 'No token provided in cookies',
                 });
             }
-
-            // Extraction du token
-            const token = authHeader.replace('Bearer ', '');
 
             // Vérification et décodage du token
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');

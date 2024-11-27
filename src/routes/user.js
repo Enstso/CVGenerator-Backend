@@ -49,8 +49,7 @@ const { verifyToken } = require('../middleware/jwt');
  *         description: Internal server error.
  */
 
-router.post('/me', verifyToken, userController.getMyInfos);
-
+router.get('/', verifyToken, userController.getMyInfos);
 
 /**
  * @swagger
@@ -91,7 +90,8 @@ router.post('/me', verifyToken, userController.getMyInfos);
  *       500:
  *         description: Internal server error.
  */
-router.put('/update', verifyToken, userController.updateMyInfos);
+router.put('/', verifyToken, userController.updateMyInfos);
 
+router.delete('/',verifyToken,userController.deleteUser);
 module.exports = router;
 

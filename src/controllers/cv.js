@@ -1,150 +1,182 @@
-const { verifyCV } = require('../validator/cv');
-const CvModel = require('../models/CV');
+const { verifyCV } = require("../validator/cv");
+const CvModel = require("../models/CV");
 
 module.exports = {
-    createCV: async (req,res) => {
-        try {
-            
-            const isNotValid = verifyCV(req.body);
-            if (isNotValid) {
-                return res.status(400).send({
-                    error: isNotValid.message,
-                });
-            }
+  createCV: async (req, res) => {
+    try {
+      const isNotValid = verifyCV(req.body);
+      if (isNotValid) {
+        return res.status(400).send({
+          error: isNotValid.message,
+        });
+      }
 
-            // Création du CV
-            const { title, summary, skills, visibility } = req.body;
+      // Création du CV
+      const { title, summary, skills, visibility } = req.body;
 
-            const newCV = new CvModel({
-                user: req.user.id,
-                title,
-                summary,
-                skills,
-                visibility: visibility || 'public',
-            });
+      const newCV = new CvModel({
+        user: req.user.id,
+        title,
+        summary,
+        skills,
+        visibility: visibility || "public",
+      });
 
-            await newCV.save();
+      await newCV.save();
 
-            res.status(201).send({
-                success: true,
-                message: 'CV created successfully',
-                cv: newCV,
-            });
-        } catch (error) {
-            res.status(500).send({
-                message: error.message || 'An error occurred while creating the CV',
-            });
-        }
-    },
+      res.status(201).send({
+        success: true,
+        message: "CV created successfully",
+        cv: newCV,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message || "An error occurred while creating the CV",
+      });
+    }
+  },
 
-    getAllPublicCvs: async (req, res) => {
-        try {
-            const cvs = await CvModel.find({ visibility: 'public' }).populate('user', 'firstname lastname email');
+  getAllPublicCvs: async (req, res) => {
+    try {
+      const cvs = await CvModel.find({ visibility: "public" }).populate(
+        "user",
+        "firstname lastname email"
+      );
 
-            res.status(200).send({
-                success: true,
-                cvs,
-            });
-        } catch (error) {
-            res.status(500).send({
-                message: error.message || 'An error occurred while retrieving CVs',
-            });
-        }
-    },
+      res.status(200).send({
+        success: true,
+        cvs,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message || "An error occurred while retrieving CVs",
+      });
+    }
+  },
 
-    getCVById: async (req, res) => {
-        try {
-            const { id } = req.params;
+  getCVById: async (req, res) => {
+    try {
+      const { id } = req.params;
 
-            const cv = await CvModel.findById(id).populate('user', 'firstname lastname email');
+      const cv = await CvModel.findById(id).populate(
+        "user",
+        "firstname lastname email"
+      );
 
-            if (!cv) {
-                return res.status(404).send({
-                    message: 'CV not found',
-                });
-            }
+      if (!cv) {
+        return res.status(404).send({
+          message: "CV not found",
+        });
+      }
 
-            if (cv.visibility === 'private' && cv.user._id.toString() !== req.user?.id) {
-                return res.status(403).send({
-                    message: 'You are not authorized to view this CV',
-                });
-            }
+      if (
+        cv.visibility === "private" &&
+        cv.user._id.toString() !== req.user?.id
+      ) {
+        return res.status(403).send({
+          message: "You are not authorized to view this CV",
+        });
+      }
 
-            res.status(200).send({
-                success: true,
-                cv,
-            });
-        } catch (error) {
-            res.status(500).send({
-                message: error.message || 'An error occurred while retrieving the CV',
-            });
-        }
-    },
+      res.status(200).send({
+        success: true,
+        cv,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message || "An error occurred while retrieving the CV",
+      });
+    }
+  },
 
-    updateCV: async (req, res) => {
-        try {
-            const { id } = req.params;
+  getCVsByUserId: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const cvs = await CvModel.find({ user: userId });
 
-            
-            const isNotValid = verifyCV(req.body);
-            if (isNotValid) {
-                return res.status(400).send({
-                    error: isNotValid.message,
-                });
-            }
+      if (!cvs || cvs.length === 0) {
+        return res
+          .status(404)
+          .send({ message: "No CVs found for the specified user" });
+      }
 
-            const updatedCv = await CvModel.findByIdAndUpdate(id, req.body, {
-                new: true
-            });
+      res.status(200).send({
+        success: true,
+        cvs,
+      });
+    } catch (error) {
+      console.error("Error retrieving user CVs:", error);
+      res
+        .status(500)
+        .send({ message: "An error occurred while retrieving CVs" });
+    }
+  },
 
-            if (!updatedCv) {
-                return res.status(404).send({
-                    message: `CV with id=${id} not found`,
-                });
-            }
+  updateCV: async (req, res) => {
+    try {
+      const { id } = req.params;
 
-            if (updatedCv.user.toString() !== req.user.id) {
-                return res.status(403).send({
-                    message: 'You are not authorized to update this CV',
-                });
-            }
-            res.status(200).send({
-                success: true,
-                message: 'CV updated successfully',
-                data: updatedCv
-            });
-        } catch (error) {
-            res.status(500).send({
-                message: error.message || `An error occurred while updating the CV with id=${req.params.id}`,
-            });
-        }
-    },
+      const isNotValid = verifyCV(req.body);
+      if (isNotValid) {
+        return res.status(400).send({
+          error: isNotValid.message,
+        });
+      }
 
-    deleteCV: async (req, res) => {
-        try {
-            const { id } = req.params;
-            const cv = await CvModel.findByIdAndDelete(id);
+      const updatedCv = await CvModel.findByIdAndUpdate(id, req.body, {
+        new: true,
+      });
 
-            if (!cv) {
-                return res.status(404).send({
-                    message: 'CV not found',
-                });
-            }
+      if (!updatedCv) {
+        return res.status(404).send({
+          message: `CV with id=${id} not found`,
+        });
+      }
 
-            if (cv.user.toString() !== req.user.id) {
-                return res.status(403).send({
-                    message: 'You are not authorized to delete this CV',
-                });
-            }
+      if (updatedCv.user.toString() !== req.user.id) {
+        return res.status(403).send({
+          message: "You are not authorized to update this CV",
+        });
+      }
+      res.status(200).send({
+        success: true,
+        message: "CV updated successfully",
+        data: updatedCv,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message:
+          error.message ||
+          `An error occurred while updating the CV with id=${req.params.id}`,
+      });
+    }
+  },
 
-            res.status(200).send({
-                success: true,
-                message: 'CV deleted successfully',
-            });
-        } catch (error) {
-            res.status(500).send({
-                message: error.message || `An error occurred while deleting the CV with id=${req.params.id}`,
-            });
-        }
-    },
+  deleteCV: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const cv = await CvModel.findByIdAndDelete(id);
+
+      if (!cv) {
+        return res.status(404).send({
+          message: "CV not found",
+        });
+      }
+
+      if (cv.user.toString() !== req.user.id) {
+        return res.status(403).send({
+          message: "You are not authorized to delete this CV",
+        });
+      }
+
+      res.status(200).send({
+        success: true,
+        message: "CV deleted successfully",
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: `An error occurred while deleting the CV`,
+      });
+    }
+  },
 };
