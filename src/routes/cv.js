@@ -176,6 +176,6 @@ router.put('/:id', verifyToken, cvController.updateCV);
  */
 router.delete('/', verifyToken, cvController.deleteCV);
 
-router.get('/myCvs')
+router.get('/user/myCvs',verifyToken,cvController.getCVsByUserId)
 module.exports = router;
 

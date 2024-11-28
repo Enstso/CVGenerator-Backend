@@ -1,5 +1,6 @@
 const { verifyCV } = require("../validator/cv");
 const CvModel = require("../models/CV");
+const mongoose = require('mongoose');
 
 module.exports = {
   createCV: async (req, res) => {
@@ -91,9 +92,10 @@ module.exports = {
 
   getCVsByUserId: async (req, res) => {
     try {
-      const userId = req.user.id;
-      const cvs = await CvModel.find({ user: userId });
 
+      const userId = req.user.id;
+
+      const cvs = await CvModel.find({ user: userId });
       if (!cvs || cvs.length === 0) {
         return res
           .status(404)

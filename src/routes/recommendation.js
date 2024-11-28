@@ -9,6 +9,7 @@ const recommendationController = require('../controllers/recommendation');
  *   name: Recommendation
  *   description: API for managing recommendations
  */
+router.get('/',verifyToken,recommendationController.getRecommendationByUserId);
 
 /**
  * @swagger
@@ -101,7 +102,7 @@ router.get('/:id',recommendationController.getRecommendationById)
  *       500:
  *         description: Internal server error.
  */
-router.get('/cv/:cvId',recommendationController.getRecommendationsByCv)
+router.get('/cv/:cvId',recommendationController.getRecommendationsByCv);
 /**
  * @swagger
  * /api/recommendations/{id}:
@@ -129,5 +130,5 @@ router.get('/cv/:cvId',recommendationController.getRecommendationsByCv)
  *       500:
  *         description: Internal server error.
  */
-router.delete('/:id', verifyToken, recommendationController.deleteRecommendation)
+router.delete('/:id', verifyToken, recommendationController.deleteRecommendation);
 module.exports = router;

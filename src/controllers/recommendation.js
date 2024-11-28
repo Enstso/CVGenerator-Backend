@@ -1,9 +1,16 @@
 const { verifyRecommendation } = require('../validator/recommendation');
 const RecommendationModel = require('../models/Recommendation');
 const CvModel = require('../models/CV');
+const recommendation = require('../validator/recommendation');
 
 module.exports = {
 
+   getRecommendationByUserId: async (req,res) => {
+        const result = await RecommendationModel.find({user:req.user.id});
+        return res.status(200).send({  success: true,
+            recommendations:result});
+
+    },
     createRecommendation: async (req, res) => {
         try {
             const isNotValid = verifyRecommendation(req.body);
@@ -51,7 +58,7 @@ module.exports = {
                 });
             }
 
-            const recommendations = await RecommendationModel.find({ cv: cvId }).populate('user', 'firstName lastName email');
+            const recommendations = await RecommendationModel.find({ cv: cvId }).populate('user', 'firstname lastname email');
             res.status(200).send({
                 success: true,
                 recommendations,
@@ -67,7 +74,7 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            const recommendation = await RecommendationModel.findById(id).populate('user', 'firstName lastName email');
+            const recommendation = await RecommendationModel.findById(id).populate('user', 'firstname lastname email');
 
             if (!recommendation) {
                 return res.status(404).send({
