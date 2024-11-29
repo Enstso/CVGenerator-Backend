@@ -179,7 +179,7 @@ This structure is designed to capture clear and organized information while main
       "lastname": "NewLastName",
       "email": "new.email@example.com",
       "oldPassword": "CurrentPassword123",
-      "password": "NewPassword123"
+      "password": "P@ssw0rd!"
   }
   ```
 - **Responses**:
@@ -299,6 +299,23 @@ This structure is designed to capture clear and organized information while main
       "title": "Updated Software Engineer",
       "summary": "Updated description of professional experience.",
       "skills": ["UpdatedSkill1", "UpdatedSkill2"],
+      "experiences": [
+        {
+          "company": "Updated Tech Corp",
+          "position": "Senior Developer",
+          "startDate": "2021-01-01",
+          "endDate": "2023-01-01",
+          "description": "Updated role involving modern technologies and leadership."
+        }
+      ],
+      "education": [
+        {
+          "school": "Updated Tech University",
+          "degree": "Master's in Computer Science",
+          "startDate": "2020-09-01",
+          "endDate": "2022-06-01"
+        }
+      ],
       "visibility": "private"
   }
   ```
