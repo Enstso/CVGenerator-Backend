@@ -1,4 +1,6 @@
 const UserModel = require("../models/User");
+const { user } = require("../validator/user");
+
 const bcrypt = require("bcrypt");
 
 module.exports = {
@@ -20,47 +22,71 @@ module.exports = {
 
   updateMyInfos: async (req, res) => {
     try {
-      const { username, firstname, lastname, email, password, oldPassword } =
-        req.body; // Ensure password is included
+      const data = req.body;
       const userId = req.user.id;
-
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        return res.status(404).send({
-          message: "User not found",
+  
+      // Validate user input
+      const isNotValidateUser = await user({
+        username: data.username,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+        password: data.password,
+      });
+  
+      if (!isNotValidateUser.success) {
+        return res.status(400).send({
+          error: isNotValidateUser.message,
         });
       }
-
-      if (firstname) user.firstname = firstname;
-      if (lastname) user.lastname = lastname;
-      if (email) user.email = email;
-      if (username) user.username = username;
-      if (password != "") {
-        if (oldPassword == req.user.password) {
-          if (bcrypt.compare(password, req.user.password)) {
-            user.password = await bcrypt.hash(password, 10);
-            await user.save();
-          }
-        }
+  
+      // Fetch user from database
+      const userDb = await UserModel.findById(userId);
+      if (!userDb) {
+        return res.status(404).send({ error: "User not found" });
       }
-
+  
+      // Verify old password before updating
+      const isPasswordValid = await bcrypt.compare(data.oldPassword, userDb.password);
+      if (!isPasswordValid) {
+        return res.status(400).send({ error: "Old password is incorrect" });
+      }
+  
+      // Hash new password if provided
+      let updatedPassword = userDb.password; // Retain old password by default
+      if (data.password) {
+        updatedPassword = await bcrypt.hash(data.password, 10);
+      }
+  
+      // Update user in database
+      const updateFields = {
+        username: data.username,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+        password: updatedPassword,
+      };
+  
+      await UserModel.updateOne({ _id: userId }, { $set: updateFields });
+  
+      // Respond with success
       res.status(200).send({
         success: true,
         message: "User updated successfully",
         user: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
+          firstname: updateFields.firstname,
+          lastname: updateFields.lastname,
+          email: updateFields.email,
         },
       });
     } catch (error) {
+      console.error("Error updating user:", error); // Log for debugging
       res.status(500).send({
-        message:
-          error.message ||
-          "Some error occurred while updating user informations",
+        message: "An error occurred while updating user information",
       });
     }
   },
+  
 
   deleteUser: async (req, res) => {
     try {
@@ -84,7 +110,7 @@ module.exports = {
       });
     } catch (error) {
       res.status(500).send({
-        message: error.message || "An error occurred while deleting the User",
+        message: "An error occurred while deleting the User",
       });
     }
   },

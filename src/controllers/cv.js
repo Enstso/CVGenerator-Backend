@@ -6,24 +6,26 @@ module.exports = {
   createCV: async (req, res) => {
     try {
       const isNotValid = verifyCV(req.body);
-      if (isNotValid) {
+      if (!isNotValid.success) {
         return res.status(400).send({
           error: isNotValid.message,
         });
       }
 
       // Création du CV
-      const { title, summary, skills, visibility } = req.body;
-
+      const { title, summary, experiences,education,skills, visibility } = req.body;
+      console.log(experiences);
       const newCV = new CvModel({
         user: req.user.id,
         title,
         summary,
         skills,
-        visibility: visibility || "public",
+        experiences,
+        education,
+        visibility: visibility || "public"
       });
-
-      await newCV.save();
+      console.log(newCV);
+     await newCV.save();
 
       res.status(201).send({
         success: true,
@@ -32,7 +34,7 @@ module.exports = {
       });
     } catch (error) {
       res.status(500).send({
-        message: error.message || "An error occurred while creating the CV",
+        message: "An error occurred while creating the CV",
       });
     }
   },
@@ -58,21 +60,19 @@ module.exports = {
   getCVById: async (req, res) => {
     try {
       const { id } = req.params;
-
       const cv = await CvModel.findById(id).populate(
         "user",
         "firstname lastname email"
       );
-
+    
       if (!cv) {
         return res.status(404).send({
           message: "CV not found",
         });
       }
-
       if (
         cv.visibility === "private" &&
-        cv.user._id.toString() !== req.user?.id
+        cv.user._id.toString() !== req.user.id
       ) {
         return res.status(403).send({
           message: "You are not authorized to view this CV",
@@ -119,7 +119,7 @@ module.exports = {
       const { id } = req.params;
 
       const isNotValid = verifyCV(req.body);
-      if (isNotValid) {
+      if (!isNotValid.success) {
         return res.status(400).send({
           error: isNotValid.message,
         });

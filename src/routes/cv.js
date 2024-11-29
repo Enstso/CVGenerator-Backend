@@ -94,7 +94,8 @@ router.get('/', cvController.getAllPublicCvs);
  *       500:
  *         description: Internal server error.
  */
-router.get('/:id', cvController.getCVById);
+
+router.get('/:id', verifyToken,cvController.getCVById);
 
 /**
  * @swagger
@@ -174,8 +175,9 @@ router.put('/:id', verifyToken, cvController.updateCV);
  *       500:
  *         description: Internal server error.
  */
-router.delete('/', verifyToken, cvController.deleteCV);
+router.delete('/:id', verifyToken, cvController.deleteCV);
 
-router.get('/user/myCvs',verifyToken,cvController.getCVsByUserId)
+router.get('/user/myCvs',verifyToken,cvController.getCVsByUserId);
+
 module.exports = router;
 

@@ -90,6 +90,7 @@ router.get('/', verifyToken, userController.getMyInfos);
  *       500:
  *         description: Internal server error.
  */
+
 router.put('/', verifyToken, userController.updateMyInfos);
 
 router.delete('/',verifyToken,userController.deleteUser);

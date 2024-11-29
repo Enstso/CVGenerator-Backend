@@ -11,49 +11,7 @@ const recommendationController = require('../controllers/recommendation');
  */
 router.get('/',verifyToken,recommendationController.getRecommendationByUserId);
 
-/**
- * @swagger
- * /api/recommendations:
- *   post:
- *     summary: Create a new recommendation
- *     description: Allows an authenticated user to create a recommendation for a specific CV.
- *     tags:
- *       - Recommendation
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               cv:
- *                 type: string
- *                 description: The ID of the CV to associate the recommendation with.
- *                 example: mettre_id_du_cvè_cree
- *               content:
- *                 type: string
- *                 description: The content of the recommendation.
- *                 example: "Excellent developer with great communication skills."
- *               rating:
- *                 type: number
- *                 description: The rating of the recommendation (1-5).
- *                 example: 5
- *               user:
- *                 type: string
- *                 description: The ID of the user to associate the recommendation with.
- *                 example: mettre_id_utilisateur
- *     responses:
- *       201:
- *         description: Recommendation created successfully.
- *       400:
- *         description: Bad request - Invalid data.
- *       401:
- *         description: Unauthorized.
- *       500:
- *         description: Internal server error.
- */
+
 router.post('/', verifyToken, recommendationController.createRecommendation)
 /**
  * @swagger
@@ -102,6 +60,7 @@ router.get('/:id',recommendationController.getRecommendationById)
  *       500:
  *         description: Internal server error.
  */
+
 router.get('/cv/:cvId',recommendationController.getRecommendationsByCv);
 /**
  * @swagger

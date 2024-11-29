@@ -9,18 +9,17 @@ module.exports = {
         const result = await RecommendationModel.find({user:req.user.id});
         return res.status(200).send({  success: true,
             recommendations:result});
-
     },
     createRecommendation: async (req, res) => {
         try {
             const isNotValid = verifyRecommendation(req.body);
-            if (isNotValid) {
+            if (!isNotValid.success) {
                 return res.status(400).send({
                     error: isNotValid.message,
                 });
             }
-            const { cv, content, rating } = req.body;
-            const cvExists = await CvModel.findById(cv);
+            const { cvId, content, rating } = req.body;
+            const cvExists = await CvModel.findById(cvId);
             if (!cvExists) {
                 return res.status(404).send({
                     message: 'CV not found',
@@ -28,7 +27,7 @@ module.exports = {
             }
             const newRecommendation = new RecommendationModel({
                 user: req.user.id,
-                cv,
+                cv:cvId,
                 content,
                 rating,
             });
@@ -73,9 +72,9 @@ module.exports = {
     getRecommendationById: async (req, res) => {
         try {
             const { id } = req.params;
-
+            
             const recommendation = await RecommendationModel.findById(id).populate('user', 'firstname lastname email');
-
+            
             if (!recommendation) {
                 return res.status(404).send({
                     message: 'Recommendation not found',
@@ -134,12 +133,11 @@ module.exports = {
         }
     },
 
-
     deleteRecommendation: async (req, res) => {
         try {
             const { id } = req.params;
 
-            const recommendation = await RecommendationModel.findById(id);
+            const recommendation = await RecommendationModel.findByIdAndDelete(id);
             
             if (!recommendation) {
                 return res.status(404).send({
@@ -152,13 +150,12 @@ module.exports = {
                     message: 'You are not authorized to delete this recommendation',
                 });
             }
-
-            await recommendation.remove();
-
+          
             res.status(200).send({
                 success: true,
                 message: 'Recommendation deleted successfully',
             });
+        
         } catch (error) {
             res.status(500).send({
                 message: error.message || 'An error occurred while deleting the recommendation',
