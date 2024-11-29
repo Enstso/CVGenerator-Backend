@@ -73,21 +73,26 @@ The recommendation model is designed to allow users to leave recommendations for
 This structure is designed to capture clear and organized information while maintaining the relationship between users, CVs, and recommendations.
 ## **Routes Overview**
 
-| Method | Endpoint                 | Description                                |
-|--------|--------------------------|--------------------------------------------|
-| POST   | `/api/auth/register`     | Register a new user                       |
-| POST   | `/api/auth/login`        | Login user and receive JWT token          |
-| POST   | `/api/users/me`          | Get information of the authenticated user |
-| PUT    | `/api/users/update`      | Update user information                   |
-| POST   | `/api/cvs`               | Create a new CV                           |
-| GET    | `/api/cvs`               | Get all public CVs                        |
-| GET    | `/api/cvs/{id}`          | Get a specific CV by ID                   |
-| PUT    | `/api/cvs/{id}`          | Update a CV                               |
-| DELETE | `/api/cvs/{id}`          | Delete a CV                               |
-| POST   | `/api/recommendations`   | Create a new recommendation               |
-| GET    | `/api/recommendations/{id}` | Get a recommendation by ID             |
-| GET    | `/api/recommendations/cv/{cvId}` | Get recommendations for a CV        |
-| DELETE | `/api/recommendations/{id}` | Delete a recommendation                 |
+| Method | Endpoint                              | Description                                   |
+|--------|--------------------------------------|-----------------------------------------------|
+| POST   | `/api/auth/register`                 | Register a new user                           |
+| POST   | `/api/auth/login`                    | Log in user and set a session cookie with JWT |
+| GET    | `/api/auth/logout`                   | Log out the authenticated user               |
+| GET    | `/api/users`                         | Retrieve information of the authenticated user |
+| PUT    | `/api/users`                         | Update user account information              |
+| DELETE | `/api/users`                         | Delete the authenticated user account        |
+| POST   | `/api/cvs`                           | Create a new CV                              |
+| GET    | `/api/cvs`                           | Get all public CVs                           |
+| GET    | `/api/cvs/{id}`                      | Retrieve a specific CV by its ID             |
+| PUT    | `/api/cvs/{id}`                      | Update a CV by its ID                        |
+| DELETE | `/api/cvs/{id}`                      | Delete a CV by its ID                        |
+| GET    | `/api/cvs/user/myCvs`                | Retrieve all CVs created by the authenticated user |
+| POST   | `/api/recommendations`               | Create a new recommendation for a CV         |
+| GET    | `/api/recommendations`               | Get all recommendations by the authenticated user |
+| GET    | `/api/recommendations/{id}`          | Retrieve a specific recommendation by its ID |
+| GET    | `/api/recommendations/cv/{cvId}`     | Get all recommendations for a specific CV    |
+| DELETE | `/api/recommendations/{id}`          | Delete a recommendation by its ID            |
+
 
 ---
 
@@ -101,10 +106,11 @@ This structure is designed to capture clear and organized information while main
 - **Request Body**:
   ```json
   {
-    "firstname": "John",
-    "lastname": "Doe",
-    "email": "john.doe@example.com",
-    "password": "P@ssw0rd!"
+  "username": "johndoe",
+  "email": "john.doe@example.com",
+  "password": "P@ssw0rd!",
+  "firstname": "John",
+  "lastname": "Doe"
   }
   ```
 - **Responses**:
@@ -133,39 +139,69 @@ This structure is designed to capture clear and organized information while main
 
 ---
 
+**GET** `/api/auth/logout`
+
+- **Description**: Clear authentication cookies to log out the user.
+- **Responses**:
+  - `200`: Successfully logged out.
+  - `500`: Internal server error.
+
+---
+
 ## **User Routes**
 
-### **1. Get Current User Info**
+### **1. Retrieve User Information**
 
-**POST** `/api/users/me`
+**POST** `/api/users`
 
-- **Description**: Retrieve information of the authenticated user.
+- **Description**: Fetches information of the currently authenticated user.
 - **Headers**:
-  - Authorization: Bearer `<JWT_TOKEN>`
+  - cookie: Contains the `jwt` session token.
 - **Responses**:
   - `200`: User details retrieved successfully.
-  - `401`: Unauthorized - Invalid or missing token.
+  - `401`: Unauthorized access (if no valid cookie is provided).
+  - `500`: Internal server error.
 
 ---
 
 ### **2. Update User Information**
 
-**PUT** `/api/users/update`
+**PUT** `/api/users`
 
-- **Description**: Update personal information of the authenticated user.
+- **Description**: Allows the authenticated user to update their profile information, including their password.
+- **Headers**:
+  - cookie: Contains the `jwt` session token.
 - **Request Body**:
   ```json
   {
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "email": "jane.smith@example.com",
-    "password": "NewPassword123"
+      "username": "new_username",
+      "firstname": "NewFirstName",
+      "lastname": "NewLastName",
+      "email": "new.email@example.com",
+      "oldPassword": "CurrentPassword123",
+      "password": "NewPassword123"
   }
   ```
 - **Responses**:
   - `200`: User updated successfully.
-  - `400`: Invalid input.
+  - `400`: Invalid input or incorrect current password.
   - `404`: User not found.
+  - `500`: Internal server error.
+
+---
+
+### **3. Delete User**
+
+**DELETE** `/api/users`
+
+- **Description**: Deletes the authenticated user's account permanently.
+- **Headers**:
+  - cookie: Contains the `jwt` session token.
+- **Responses**:
+  - `200`: User deleted successfully.
+  - `400`: Unauthorized access (if the user tries to delete another account).
+  - `404`: User not found.
+  - `500`: Internal server error.
 
 ---
 
@@ -177,14 +213,31 @@ This structure is designed to capture clear and organized information while main
 
 - **Description**: Create a new CV for the authenticated user.
 - **Headers**:
-  - Authorization: Bearer `<JWT_TOKEN>`
+  - cookie: Contains the `jwt` session token.
 - **Request Body**:
   ```json
   {
-    "title": "Software Engineer",
-    "summary": "Experienced in full-stack development.",
-    "skills": ["JavaScript", "React", "Node.js"],
-    "visibility": "public"
+      "title": "Software Engineer",
+      "summary": "Experienced in full-stack development.",
+      "skills": ["JavaScript", "React", "Node.js"],
+      "experiences": [
+        {
+          "company": "Tech Corp",
+          "position": "Developer",
+          "startDate": "2020-01-01",
+          "endDate": "2022-01-01",
+          "description": "Worked on various projects using modern technologies."
+        }
+      ],
+      "education": [
+        {
+          "school": "Tech University",
+          "degree": "Bachelor's in Computer Science",
+          "startDate": "2015-09-01",
+          "endDate": "2019-06-01"
+        }
+      ],
+      "visibility": "public"
   }
   ```
 - **Responses**:
@@ -198,9 +251,9 @@ This structure is designed to capture clear and organized information while main
 
 **GET** `/api/cvs`
 
-- **Description**: Retrieve a list of all public CVs.
+- **Description**: Retrieve all publicly visible CVs.
 - **Responses**:
-  - `200`: Successfully retrieved CVs.
+  - `200`: List of publics CVs.
   - `500`: Internal server error.
 
 ---
@@ -209,68 +262,130 @@ This structure is designed to capture clear and organized information while main
 
 **GET** `/api/cvs/{id}`
 
-- **Description**: Retrieve a specific CV by its ID.
+- **Description**: Retrieve a specific CV by its ID. Private CVs can only be accessed by their owners.
+- **Headers**:
+  - cookie: Contains the `jwt` session token.
 - **Responses**:
   - `200`: CV details retrieved successfully.
+  - `403`: Unauthorized to access a private CV.
   - `404`: CV not found.
-
+  - `500`: Internal server error.
 ---
 
-### **4. Update a CV**
+### **4. Get Authenticated User's CVs**
+
+**GET** `/api/cvs/user/myCvs`
+
+- **Description**: Retrieve all CVs created by the authenticated user.
+- **Headers**:
+  - cookie: Contains the `jwt` session token.
+- **Responses**:
+  - `200`: List of user's CVs.
+  - `404`: No CVs found for the user.
+  - `401`: Unauthorized.
+  - `500`: Internal server error.
+---
+
+### **5. Update a CV**
 
 **PUT** `/api/cvs/{id}`
 
-- **Description**: Update a CV belonging to the authenticated user.
+- **Description**: Update a CV by ID. Only the owner of the CV can update it.
 - **Headers**:
-  - Authorization: Bearer `<JWT_TOKEN>`
+  - cookie: Contains the `jwt` session token.
 - **Request Body**:
   ```json
   {
-    "title": "Updated Title",
-    "summary": "Updated summary",
-    "skills": ["JavaScript", "React"],
-    "visibility": "private"
+      "title": "Updated Software Engineer",
+      "summary": "Updated description of professional experience.",
+      "skills": ["UpdatedSkill1", "UpdatedSkill2"],
+      "visibility": "private"
   }
   ```
 - **Responses**:
   - `200`: CV updated successfully.
-  - `401`: Unauthorized.
+  - `403`: Unauthorized to update another user's CV.
   - `404`: CV not found.
+  - `400`: Invalid input.
+  - `500`: Internal server error.
 
+---
+
+### **6. Delete a CV**
+
+**PUT** `/api/cvs/{id}`
+
+- **Description**: Delete a CV by ID. Only the owner of the CV can delete it.
+- **Headers**:
+  - cookie: Contains the `jwt` session token.
+- **Responses**:
+  - `200`: CV deleted successfully.
+  - `403`: Unauthorized to delete another user's CV.
+  - `404`: CV not found.
+  - `500`: Internal server error.
+  
 ---
 
 ## **Recommendation Routes**
 
-### **1. Create a Recommendation**
+### **1. Retrieve Recommendations by User**
+
+**GET** `/api/recommendations`
+
+- **Description**: Fetches all recommendations created by the authenticated user.
+- **Headers**:
+  - cookie: Contains the `jwt` session token.
+- **Responses**:
+  - `200`: Successfully retrieved the user's recommendations.
+  - `401`: Unauthorized access (if no valid token is provided).
+  - `500`: Internal server error.
+
+---
+
+### **2. Create a Recommendation**
 
 **POST** `/api/recommendations`
 
-- **Description**: Create a recommendation for a specific CV.
+- **Description**: Allows an authenticated user to create a new recommendation for a specific CV.
 - **Headers**:
-  - Authorization: Bearer `<JWT_TOKEN>`
+  - cookie: Contains the `jwt` session token.
 - **Request Body**:
   ```json
   {
-    "cv": "cv_id",
-    "content": "Excellent developer with great communication skills.",
-    "rating": 5
+      "cv": "cv_id",
+      "content": "Excellent developer with great communication skills.",
+      "rating": 5
   }
   ```
 - **Responses**:
   - `201`: Recommendation created successfully.
   - `400`: Invalid input.
-  - `401`: Unauthorized.
+  - `404`: CV not found.
+  - `500`: Internal server error.
 
 ---
 
-### **2. Get Recommendations for a CV**
+### **3. Retrieve Recommendations by ID**
 
-**GET** `/api/recommendations/cv/{cvId}`
+**GET** `/api/recommendations/{cvId}`
 
-- **Description**: Retrieve recommendations for a specific CV by its ID.
+- **Description**: Fetches the details of a specific recommendation by its ID.
 - **Responses**:
   - `200`: Recommendations retrieved successfully.
   - `404`: CV not found.
+  - `500`: Internal server error.
+
+---
+
+### **4. Retrieve Recommendations for a CV**
+
+**GET** `/api/recommendations/cv/{cvId}`
+
+- **Description**: Retrieves all recommendations associated with a specific CV.
+- **Responses**:
+  - `200`: Recommendations retrieved successfully.
+  - `404`: CV not found.
+  - `500`: Internal server error.
 
 ---
 

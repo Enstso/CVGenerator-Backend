@@ -15,11 +15,11 @@ const { verifyToken } = require('../middleware/jwt');
  * /api/cvs:
  *   post:
  *     summary: Create a new CV
- *     description: Allows an authenticated user to create a new CV.
+ *     description: Allows an authenticated user to create a new CV. Authentication is managed through a session cookie containing a JWT.
  *     tags:
  *       - CV
  *     security:
- *       - BearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -89,6 +89,8 @@ router.get('/', cvController.getAllPublicCvs);
  *     responses:
  *       200:
  *         description: Successfully retrieved CV details.
+ *       401:
+ *         description: Unauthorized.
  *       404:
  *         description: CV not found.
  *       500:
@@ -102,11 +104,11 @@ router.get('/:id', verifyToken,cvController.getCVById);
  * /api/cvs/{id}:
  *   put:
  *     summary: Update a CV
- *     description: Allows an authenticated user to update one of their CVs.
+ *     description: Allows an authenticated user to update one of their CVs. Authentication is managed through a session cookie containing a JWT.
  *     tags:
  *       - CV
  *     security:
- *       - BearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -153,11 +155,11 @@ router.put('/:id', verifyToken, cvController.updateCV);
  * /api/cvs/{id}:
  *   delete:
  *     summary: Delete a CV
- *     description: Allows an authenticated user to delete one of their CVs.
+ *     description: Allows an authenticated user to delete one of their CVs. Authentication is managed through a session cookie containing a JWT.
  *     tags:
  *       - CV
  *     security:
- *       - BearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -177,6 +179,65 @@ router.put('/:id', verifyToken, cvController.updateCV);
  */
 router.delete('/:id', verifyToken, cvController.deleteCV);
 
+/**
+ * @swagger
+ * /api/cvs/user/myCvs:
+ *   get:
+ *     summary: Retrieve all CVs created by the authenticated user
+ *     description: Returns a list of all CVs that belong to the currently authenticated user.
+ *     tags:
+ *       - CV
+ *     security:
+ *       - cookieAuth: [] # JWT session token
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user's CVs.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 cvs:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "6744a42b5e47a033e03209bf"
+ *                       title:
+ *                         type: string
+ *                         example: "Software Engineer"
+ *                       summary:
+ *                         type: string
+ *                         example: "Experienced in full-stack development."
+ *                       skills:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                         example: ["JavaScript", "React", "Node.js"]
+ *                       visibility:
+ *                         type: string
+ *                         enum: [public, private]
+ *                         example: "public"
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-11-25T16:22:03.274Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-11-25T16:22:03.274Z"
+ *       401:
+ *         description: Unauthorized - User not authenticated.
+ *       404:
+ *         description: No CVs found for the user.
+ *       500:
+ *         description: Internal server error.
+ */
 router.get('/user/myCvs',verifyToken,cvController.getCVsByUserId);
 
 module.exports = router;

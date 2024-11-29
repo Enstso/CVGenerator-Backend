@@ -20,7 +20,8 @@ const swaggerOptions = {
         openapi: '3.0.0',
         info: {
             title: '',
-            version: '1.0.0'
+            version: '1.0.0',
+            description: 'API documentation for the backend services.'
         },
         servers: [
             {
@@ -29,16 +30,17 @@ const swaggerOptions = {
         ],
         components: {
             securitySchemes: {
-                BearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT'
+                cookieAuth: {
+                    type: 'apiKey',
+                    in: 'cookie',
+                    name: 'jwt',
+                    description: 'Session-based JWT authentication'
                 }
             }
         },
         security: [
             {
-                BearerAuth: []
+                cookieAuth: []
             }
         ]
     },

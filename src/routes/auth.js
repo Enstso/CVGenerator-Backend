@@ -54,22 +54,27 @@ const authController = require("../controllers/auth");
  *             schema:
  *               type: object
  *               properties:
- *                 id:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
  *                   type: string
- *                   description: The unique identifier of the user.
- *                   example: "670507e5a85e8b4542098ab9"
- *                 firstname:
- *                   type: string
- *                   description: The first name of the user.
- *                   example: John
- *                 lastname:
- *                   type: string
- *                   description: The last name of the user.
- *                   example: Doe
- *                 email:
- *                   type: string
- *                   description: The email address of the user.
- *                   example: john.doe@example.com
+ *                   example: User registered successfully.
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "670507e5a85e8b4542098ab9"
+ *                     firstname:
+ *                       type: string
+ *                       example: John
+ *                     lastname:
+ *                       type: string
+ *                       example: Doe
+ *                     email:
+ *                       type: string
+ *                       example: john.doe@example.com
  *       400:
  *         description: Bad request - Invalid input or missing required fields.
  *       500:
@@ -82,7 +87,7 @@ router.post("/register", authController.register);
  * /api/auth/login:
  *   post:
  *     summary: Authenticate user
- *     description: Logs in a user and returns a JWT token for authenticated access.
+ *     description: Logs in a user and sets a session cookie containing a JWT for authenticated access.
  *     tags:
  *       - Authentication
  *     requestBody:
@@ -107,34 +112,32 @@ router.post("/register", authController.register);
  *                 example: P@ssw0rd!
  *     responses:
  *       200:
- *         description: Successfully authenticated.
+ *         description: Successfully authenticated. A JWT is stored in a session cookie.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
  *                   type: string
- *                   description: JWT token for accessing protected routes.
- *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                   example: Login successful.
  *                 user:
  *                   type: object
  *                   properties:
  *                     id:
  *                       type: string
- *                       description: The unique identifier of the user.
  *                       example: "670507e5a85e8b4542098ab9"
  *                     firstname:
  *                       type: string
- *                       description: The first name of the user.
  *                       example: John
  *                     lastname:
  *                       type: string
- *                       description: The last name of the user.
  *                       example: Doe
  *                     email:
  *                       type: string
- *                       description: The email address of the user.
  *                       example: john.doe@example.com
  *       401:
  *         description: Unauthorized - Email or password incorrect.
@@ -143,6 +146,31 @@ router.post("/register", authController.register);
  */
 router.post("/login", authController.login);
 
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   get:
+ *     summary: Logout user
+ *     description: Logs out the authenticated user by clearing the session cookie.
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Successfully logged out.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Logout successful.
+ *       500:
+ *         description: Internal server error.
+ */
 router.get("/logout", authController.logout);
 
 module.exports = router;
