@@ -23,11 +23,16 @@ const authController = require("../controllers/auth");
  *           schema:
  *             type: object
  *             required:
+ *               - username
  *               - firstname
  *               - lastname
  *               - email
  *               - password
  *             properties:
+ *               username:
+ *                 type: string
+ *                 description: username
+ *                 example: JohnDoe
  *               firstname:
  *                 type: string
  *                 description: The user's first name.

@@ -73,7 +73,7 @@ router.get('/',verifyToken,recommendationController.getRecommendationByUserId);
  *               cvId:
  *                 type: string
  *                 description: The ID of the CV to associate the recommendation with.
- *                 example: "cv12345"
+ *                 example: "mettre id du cv"
  *               content:
  *                 type: string
  *                 description: The content of the recommendation.

@@ -38,6 +38,47 @@ const { verifyToken } = require('../middleware/jwt');
  *                 items:
  *                   type: string
  *                 example: ["JavaScript", "React", "Node.js"]
+ *               experiences:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     company:
+ *                       type: string
+ *                       example: Tech Corp
+ *                     position:
+ *                       type: string
+ *                       example: Developer
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2020-01-01
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2022-01-01
+ *                     description:
+ *                       type: string
+ *                       example: Worked on various projects using modern technologies.
+ *               education:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     school:
+ *                       type: string
+ *                       example: Tech University
+ *                     degree:
+ *                       type: string
+ *                       example: Bachelor's in Computer Science
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2015-09-01
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2019-06-01
  *               visibility:
  *                 type: string
  *                 enum: [public, private]
@@ -45,6 +86,79 @@ const { verifyToken } = require('../middleware/jwt');
  *     responses:
  *       201:
  *         description: CV created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: CV created successfully.
+ *                 cv:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "63e5b8c55a9a1b0021a1c8b7"
+ *                     title:
+ *                       type: string
+ *                       example: Software Engineer
+ *                     summary:
+ *                       type: string
+ *                       example: Experienced in full-stack development.
+ *                     skills:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: ["JavaScript", "React", "Node.js"]
+ *                     experiences:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           company:
+ *                             type: string
+ *                             example: Tech Corp
+ *                           position:
+ *                             type: string
+ *                             example: Developer
+ *                           startDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2020-01-01
+ *                           endDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2022-01-01
+ *                           description:
+ *                             type: string
+ *                             example: Worked on various projects using modern technologies.
+ *                     education:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           school:
+ *                             type: string
+ *                             example: Tech University
+ *                           degree:
+ *                             type: string
+ *                             example: Bachelor's in Computer Science
+ *                           startDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2015-09-01
+ *                           endDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2019-06-01
+ *                     visibility:
+ *                       type: string
+ *                       enum: [public, private]
+ *                       example: public
  *       400:
  *         description: Bad request - Invalid data.
  *       401:
@@ -134,6 +248,47 @@ router.get('/:id', verifyToken,cvController.getCVById);
  *                 items:
  *                   type: string
  *                 example: ["JavaScript", "React"]
+ *               experiences:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     company:
+ *                       type: string
+ *                       example: Updated Tech Corp
+ *                     position:
+ *                       type: string
+ *                       example: Lead Developer
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2020-01-01
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2022-12-31
+ *                     description:
+ *                       type: string
+ *                       example: Led a team of developers to build scalable applications.
+ *               education:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     school:
+ *                       type: string
+ *                       example: Updated Tech University
+ *                     degree:
+ *                       type: string
+ *                       example: Master's in Computer Science
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2020-09-01
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2022-06-01
  *               visibility:
  *                 type: string
  *                 enum: [public, private]
@@ -141,6 +296,79 @@ router.get('/:id', verifyToken,cvController.getCVById);
  *     responses:
  *       200:
  *         description: CV updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: CV updated successfully.
+ *                 cv:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "63e5b8c55a9a1b0021a1c8b7"
+ *                     title:
+ *                       type: string
+ *                       example: Updated Title
+ *                     summary:
+ *                       type: string
+ *                       example: Updated Summary
+ *                     skills:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: ["JavaScript", "React"]
+ *                     experiences:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           company:
+ *                             type: string
+ *                             example: Updated Tech Corp
+ *                           position:
+ *                             type: string
+ *                             example: Lead Developer
+ *                           startDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2020-01-01
+ *                           endDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2022-12-31
+ *                           description:
+ *                             type: string
+ *                             example: Led a team of developers to build scalable applications.
+ *                     education:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           school:
+ *                             type: string
+ *                             example: Updated Tech University
+ *                           degree:
+ *                             type: string
+ *                             example: Master's in Computer Science
+ *                           startDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2020-09-01
+ *                           endDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2022-06-01
+ *                     visibility:
+ *                       type: string
+ *                       enum: [public, private]
+ *                       example: private
  *       401:
  *         description: Unauthorized.
  *       404:
@@ -148,6 +376,7 @@ router.get('/:id', verifyToken,cvController.getCVById);
  *       500:
  *         description: Internal server error.
  */
+
 router.put('/:id', verifyToken, cvController.updateCV);
 
 /**

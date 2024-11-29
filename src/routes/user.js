@@ -83,7 +83,7 @@ router.get('/', verifyToken, userController.getMyInfos);
  *               oldPassword:
  *                 type: string
  *                 description: The current password of the user.
- *                 example: CurrentPassword123
+ *                 example: P@ssw0rd!
  *               password:
  *                 type: string
  *                 description: The new password for the user.
