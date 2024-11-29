@@ -7,6 +7,8 @@ module.exports = {
   getMyInfos: async (req, res) => {
     try {
       const { username, firstname, lastname, email } = req.user;
+
+      // Respond with the user's information
       res.send({
         username,
         firstname,
@@ -22,10 +24,10 @@ module.exports = {
 
   updateMyInfos: async (req, res) => {
     try {
-      const data = req.body;
-      const userId = req.user.id;
+      const data = req.body; // Get the updated data from the request body
+      const userId = req.user.id; // Get the authenticated user's ID from req.user
   
-      // Validate user input
+      // Validate user input using a custom validation function
       const isNotValidateUser = await user({
         username: data.username,
         firstname: data.firstname,
@@ -66,7 +68,8 @@ module.exports = {
         email: data.email,
         password: updatedPassword,
       };
-  
+      
+      // Update the user's information in the database
       await UserModel.updateOne({ _id: userId }, { $set: updateFields });
   
       // Respond with success
@@ -91,6 +94,8 @@ module.exports = {
   deleteUser: async (req, res) => {
     try {
       const userId = req.user.id;
+
+      // Find and delete the user by ID
       const user = await UserModel.findByIdAndDelete(userId);
 
       if (!user) {

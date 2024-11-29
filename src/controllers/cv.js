@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 module.exports = {
   createCV: async (req, res) => {
     try {
+      // Validate the CV data using a validation function
       const isNotValid = verifyCV(req.body);
       if (!isNotValid.success) {
         return res.status(400).send({
@@ -12,9 +13,11 @@ module.exports = {
         });
       }
 
-      // Création du CV
+      // Destructure required fields from the request body
       const { title, summary, experiences,education,skills, visibility } = req.body;
       console.log(experiences);
+
+      // Create a new CV instance using the data provided in the request
       const newCV = new CvModel({
         user: req.user.id,
         title,
@@ -26,7 +29,7 @@ module.exports = {
       });
       console.log(newCV);
      await newCV.save();
-
+      // Respond with success message and the created CV
       res.status(201).send({
         success: true,
         message: "CV created successfully",
@@ -41,11 +44,12 @@ module.exports = {
 
   getAllPublicCvs: async (req, res) => {
     try {
+       // Retrieve all public CVs from the database
       const cvs = await CvModel.find({ visibility: "public" }).populate(
-        "user",
+        "user", // Populate the user details (firstname, lastname, email)
         "firstname lastname email"
       );
-
+      // Respond with the list of public CVs
       res.status(200).send({
         success: true,
         cvs,
@@ -60,6 +64,7 @@ module.exports = {
   getCVById: async (req, res) => {
     try {
       const { id } = req.params;
+      // Find the CV by its ID and populate user details
       const cv = await CvModel.findById(id).populate(
         "user",
         "firstname lastname email"
@@ -70,6 +75,7 @@ module.exports = {
           message: "CV not found",
         });
       }
+      // Check if the CV is private and the current user is not the owner
       if (
         cv.visibility === "private" &&
         cv.user._id.toString() !== req.user.id
@@ -78,7 +84,7 @@ module.exports = {
           message: "You are not authorized to view this CV",
         });
       }
-
+      // Respond with the CV details
       res.status(200).send({
         success: true,
         cv,
@@ -95,6 +101,7 @@ module.exports = {
 
       const userId = req.user.id;
 
+      // Find all CVs belonging to the user
       const cvs = await CvModel.find({ user: userId });
       if (!cvs || cvs.length === 0) {
         return res
@@ -102,6 +109,7 @@ module.exports = {
           .send({ message: "No CVs found for the specified user" });
       }
 
+      // Respond with the user's CVs
       res.status(200).send({
         success: true,
         cvs,
@@ -125,8 +133,9 @@ module.exports = {
         });
       }
 
+      // Find and update the CV by its ID
       const updatedCv = await CvModel.findByIdAndUpdate(id, req.body, {
-        new: true,
+        new: true, // Return the updated document
       });
 
       if (!updatedCv) {
@@ -140,6 +149,8 @@ module.exports = {
           message: "You are not authorized to update this CV",
         });
       }
+
+      // Respond with success message and updated CV data
       res.status(200).send({
         success: true,
         message: "CV updated successfully",
@@ -157,6 +168,8 @@ module.exports = {
   deleteCV: async (req, res) => {
     try {
       const { id } = req.params;
+
+      // Find and delete the CV by its ID
       const cv = await CvModel.findByIdAndDelete(id);
 
       if (!cv) {
@@ -165,6 +178,7 @@ module.exports = {
         });
       }
 
+      // Ensure the user deleting the CV is its owner
       if (cv.user.toString() !== req.user.id) {
         return res.status(403).send({
           message: "You are not authorized to delete this CV",

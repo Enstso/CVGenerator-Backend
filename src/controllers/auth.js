@@ -70,20 +70,26 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
+
+      // Verify the login credentials using a custom method
       const result = await UserModel.verifyLogin(email, password);
       if (!result.success) {
         return res.status(401).send({ error: result.message });
       }
+
+      // Generate a JWT token for the authenticated user
       const secret = process.env.JWT_SECRET || "secret";
       const jwtData = {
         expiresIn: process.env.JWT_TIMEOUT_DURATION || "1h",
       };
       const token = jwt.sign({ email }, secret, jwtData);
+
+      // Set the JWT token as a cookie to manage sessions
       res.cookie("jwt", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "Strict",
-        maxAge: 3600000,
+        httpOnly: true, // Protect cookie from client-side access
+        secure: true, // Ensure the cookie is only sent over HTTPS
+        sameSite: "Strict", // Prevent cross-site request forgery (CSRF)
+        maxAge: 3600000, // Set cookie expiration (1 hour in this case)
       });
       return res.status(200).send({
         message: "Login successful.",
@@ -97,6 +103,7 @@ module.exports = {
 
   logout: (req, res) => {
     try {
+      // Clear the JWT cookie to log the user out
       res.clearCookie("jwt", {
         httpOnly: true,
         secure: true,
