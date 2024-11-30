@@ -15,11 +15,11 @@ const { verifyToken } = require('../middleware/jwt');
  * /api/cvs:
  *   post:
  *     summary: Create a new CV
- *     description: Allows an authenticated user to create a new CV.
+ *     description: Allows an authenticated user to create a new CV. Authentication is managed through a session cookie containing a JWT.
  *     tags:
  *       - CV
  *     security:
- *       - BearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -38,6 +38,47 @@ const { verifyToken } = require('../middleware/jwt');
  *                 items:
  *                   type: string
  *                 example: ["JavaScript", "React", "Node.js"]
+ *               experiences:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     company:
+ *                       type: string
+ *                       example: Tech Corp
+ *                     position:
+ *                       type: string
+ *                       example: Developer
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2020-01-01
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2022-01-01
+ *                     description:
+ *                       type: string
+ *                       example: Worked on various projects using modern technologies.
+ *               education:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     school:
+ *                       type: string
+ *                       example: Tech University
+ *                     degree:
+ *                       type: string
+ *                       example: Bachelor's in Computer Science
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2015-09-01
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2019-06-01
  *               visibility:
  *                 type: string
  *                 enum: [public, private]
@@ -45,6 +86,79 @@ const { verifyToken } = require('../middleware/jwt');
  *     responses:
  *       201:
  *         description: CV created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: CV created successfully.
+ *                 cv:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "63e5b8c55a9a1b0021a1c8b7"
+ *                     title:
+ *                       type: string
+ *                       example: Software Engineer
+ *                     summary:
+ *                       type: string
+ *                       example: Experienced in full-stack development.
+ *                     skills:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: ["JavaScript", "React", "Node.js"]
+ *                     experiences:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           company:
+ *                             type: string
+ *                             example: Tech Corp
+ *                           position:
+ *                             type: string
+ *                             example: Developer
+ *                           startDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2020-01-01
+ *                           endDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2022-01-01
+ *                           description:
+ *                             type: string
+ *                             example: Worked on various projects using modern technologies.
+ *                     education:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           school:
+ *                             type: string
+ *                             example: Tech University
+ *                           degree:
+ *                             type: string
+ *                             example: Bachelor's in Computer Science
+ *                           startDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2015-09-01
+ *                           endDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2019-06-01
+ *                     visibility:
+ *                       type: string
+ *                       enum: [public, private]
+ *                       example: public
  *       400:
  *         description: Bad request - Invalid data.
  *       401:
@@ -89,23 +203,26 @@ router.get('/', cvController.getAllPublicCvs);
  *     responses:
  *       200:
  *         description: Successfully retrieved CV details.
+ *       401:
+ *         description: Unauthorized.
  *       404:
  *         description: CV not found.
  *       500:
  *         description: Internal server error.
  */
-router.get('/:id', cvController.getCVById);
+
+router.get('/:id', verifyToken,cvController.getCVById);
 
 /**
  * @swagger
  * /api/cvs/{id}:
  *   put:
  *     summary: Update a CV
- *     description: Allows an authenticated user to update one of their CVs.
+ *     description: Allows an authenticated user to update one of their CVs. Authentication is managed through a session cookie containing a JWT.
  *     tags:
  *       - CV
  *     security:
- *       - BearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -131,6 +248,47 @@ router.get('/:id', cvController.getCVById);
  *                 items:
  *                   type: string
  *                 example: ["JavaScript", "React"]
+ *               experiences:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     company:
+ *                       type: string
+ *                       example: Updated Tech Corp
+ *                     position:
+ *                       type: string
+ *                       example: Lead Developer
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2020-01-01
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2022-12-31
+ *                     description:
+ *                       type: string
+ *                       example: Led a team of developers to build scalable applications.
+ *               education:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     school:
+ *                       type: string
+ *                       example: Updated Tech University
+ *                     degree:
+ *                       type: string
+ *                       example: Master's in Computer Science
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2020-09-01
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       example: 2022-06-01
  *               visibility:
  *                 type: string
  *                 enum: [public, private]
@@ -138,6 +296,79 @@ router.get('/:id', cvController.getCVById);
  *     responses:
  *       200:
  *         description: CV updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: CV updated successfully.
+ *                 cv:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "63e5b8c55a9a1b0021a1c8b7"
+ *                     title:
+ *                       type: string
+ *                       example: Updated Title
+ *                     summary:
+ *                       type: string
+ *                       example: Updated Summary
+ *                     skills:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: ["JavaScript", "React"]
+ *                     experiences:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           company:
+ *                             type: string
+ *                             example: Updated Tech Corp
+ *                           position:
+ *                             type: string
+ *                             example: Lead Developer
+ *                           startDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2020-01-01
+ *                           endDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2022-12-31
+ *                           description:
+ *                             type: string
+ *                             example: Led a team of developers to build scalable applications.
+ *                     education:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           school:
+ *                             type: string
+ *                             example: Updated Tech University
+ *                           degree:
+ *                             type: string
+ *                             example: Master's in Computer Science
+ *                           startDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2020-09-01
+ *                           endDate:
+ *                             type: string
+ *                             format: date
+ *                             example: 2022-06-01
+ *                     visibility:
+ *                       type: string
+ *                       enum: [public, private]
+ *                       example: private
  *       401:
  *         description: Unauthorized.
  *       404:
@@ -145,6 +376,7 @@ router.get('/:id', cvController.getCVById);
  *       500:
  *         description: Internal server error.
  */
+
 router.put('/:id', verifyToken, cvController.updateCV);
 
 /**
@@ -152,11 +384,11 @@ router.put('/:id', verifyToken, cvController.updateCV);
  * /api/cvs/{id}:
  *   delete:
  *     summary: Delete a CV
- *     description: Allows an authenticated user to delete one of their CVs.
+ *     description: Allows an authenticated user to delete one of their CVs. Authentication is managed through a session cookie containing a JWT.
  *     tags:
  *       - CV
  *     security:
- *       - BearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -175,6 +407,67 @@ router.put('/:id', verifyToken, cvController.updateCV);
  *         description: Internal server error.
  */
 router.delete('/:id', verifyToken, cvController.deleteCV);
+
+/**
+ * @swagger
+ * /api/cvs/user/myCvs:
+ *   get:
+ *     summary: Retrieve all CVs created by the authenticated user
+ *     description: Returns a list of all CVs that belong to the currently authenticated user.
+ *     tags:
+ *       - CV
+ *     security:
+ *       - cookieAuth: [] # JWT session token
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user's CVs.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 cvs:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "6744a42b5e47a033e03209bf"
+ *                       title:
+ *                         type: string
+ *                         example: "Software Engineer"
+ *                       summary:
+ *                         type: string
+ *                         example: "Experienced in full-stack development."
+ *                       skills:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                         example: ["JavaScript", "React", "Node.js"]
+ *                       visibility:
+ *                         type: string
+ *                         enum: [public, private]
+ *                         example: "public"
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-11-25T16:22:03.274Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-11-25T16:22:03.274Z"
+ *       401:
+ *         description: Unauthorized - User not authenticated.
+ *       404:
+ *         description: No CVs found for the user.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get('/user/myCvs',verifyToken,cvController.getCVsByUserId);
 
 module.exports = router;
 

@@ -12,7 +12,7 @@ const CvSchema = new Schema(
             type: String,
             required: true
         },
-        summmary: {
+        summary: {
             type: String
         },
         skills: [String],
@@ -44,4 +44,4 @@ const CvSchema = new Schema(
     }
 );
 
-module.exports = mongoose.model('Cv', CvSchema);
+module.exports = mongoose.model('cv', CvSchema);

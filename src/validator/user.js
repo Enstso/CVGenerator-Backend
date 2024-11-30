@@ -1,50 +1,123 @@
-const { Validator } = require('jsonschema');
-const validator = require('validator');
+const { Validator } = require("jsonschema");
+const UserModel = require("../models/User");
 
 module.exports = {
-    verifyUser: (user) => {
-        let validator = new Validator();
-        let userSchema = {
-            type: 'object',
-            properties: {
-                firstname: {
-                    type: 'string',
-                    minLength: 1,
-                    maxLength: 20,
-                    errorMessage: 'User firstname is missinng or incorrect'
-                },
-                lastname: {
-                    type: 'string',
-                    minLength: 1,
-                    maxLength: 20,
-                    errorMessage: 'User lastname is missinng or incorrect'
-                },
-                email: {
-                    type: 'email',
-                    format: 'email',
-                    errorMessage: 'User email is missinng or incorrect'
-                },
-                password: {
-                    type: 'string',
-                    minLength: 6,
-                    errorMessage: "User's password, must contain at least one uppercase letter and one digit",
-                    pattern: '^(?=.*[A-Z])(?=.*[0-9]).+$'
-                }
-            },
-            required: ['fistname', 'lastname', 'email', 'password']
-        };
-        
-        const result = validator.validator(user, userSchema);
+  register: async (user) => {
+    const validator = new Validator();
+    const userSchema = {
+      type: "object",
+      properties: {
+        firstname: {
+          type: "string",
+          minLength: 1,
+          maxLength: 20,
+          errorMessage: "User firstname is missing or incorrect",
+        },
+        lastname: {
+          type: "string",
+          minLength: 1,
+          maxLength: 20,
+          errorMessage: "User lastname is missing or incorrect",
+        },
+        username: {
+          type: "string",
+          minLength: 1,
+          maxLength: 20,
+          errorMessage: "User username is missing or incorrect",
+        },
+        email: {
+          type: "string",
+          format: "email",
+          errorMessage: "User email is missing or incorrect",
+        },
+        password: {
+          type: "string",
+          minLength: 6,
+          errorMessage:
+            "User's password must contain at least one uppercase letter and one digit",
+          pattern: "^(?=.*[A-Z])(?=.*[0-9]).+$",
+        },
+      },
+      required: ["username", "firstname", "lastname", "email", "password"],
+    };
 
-        if (Array.isArray(result.errors) && result.errors.length) {
-            let failedInputs = '';
-
-            result.errors.forEach((error) => {
-                failedInputs += (error.schema.error || error.message) + ', '
-            });
-            return {
-                message: failedInputs
-            }
-        }
+    // Validation de la structure JSON
+    const result = validator.validate(user, userSchema);
+    if (Array.isArray(result.errors) && result.errors.length) {
+      let failedInputs = result.errors
+        .map((error) => error.schema?.errorMessage || error.message)
+        .join(", ");
+      return {
+        success: false,
+        message: failedInputs,
+      };
     }
-}
+
+    // Vérifier si l'utilisateur existe déjà (par email ou username)
+    const existingUser = await UserModel.checkUserExists(
+      user.email,
+      user.username
+    );
+    if (existingUser) {
+      return {
+        success: false,
+        message: "User already exists with the provided email or username",
+      };
+    }
+    // Validation réussie
+    return { success: true };
+  },
+  user: async (user) => {
+    const validator = new Validator();
+    const userSchema = {
+      type: "object",
+      properties: {
+        firstname: {
+          type: "string",
+          minLength: 1,
+          maxLength: 20,
+          errorMessage: "User firstname is missing or incorrect",
+        },
+        lastname: {
+          type: "string",
+          minLength: 1,
+          maxLength: 20,
+          errorMessage: "User lastname is missing or incorrect",
+        },
+        username: {
+          type: "string",
+          minLength: 1,
+          maxLength: 20,
+          errorMessage: "User username is missing or incorrect",
+        },
+        email: {
+          type: "string",
+          format: "email",
+          errorMessage: "User email is missing or incorrect",
+        },
+        password: {
+          type: "string",
+          minLength: 6,
+          errorMessage:
+            "User's password must contain at least one uppercase letter and one digit",
+          pattern: "^(?=.*[A-Z])(?=.*[0-9]).+$",
+        },
+      },
+      required: ["username", "firstname", "lastname", "email", "password"],
+    };
+
+    // Validation de la structure JSON
+    const result = validator.validate(user, userSchema);
+    if (Array.isArray(result.errors) && result.errors.length) {
+      let failedInputs = result.errors
+        .map((error) => error.schema?.errorMessage || error.message)
+        .join(", ");
+      return {
+        success: false,
+        message: failedInputs,
+      };
+    }
+    // Validation réussie
+    return { success: true };
+  },
+};

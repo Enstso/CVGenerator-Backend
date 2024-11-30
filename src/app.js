@@ -6,17 +6,22 @@ const apiRouter = require('./routes');
 const cors = require('cors');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
+const cookieParser = require('cookie-parser');
 
-app.use(cors());
-
+app.use(cors({
+    origin: 'https://cvgenerator-frontend.onrender.com', // Specific origin
+    credentials: true // Allow cookies or credentials
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 const swaggerOptions = {
     swaggerDefinition: {
         openapi: '3.0.0',
         info: {
             title: '',
-            version: '1.0.0'
+            version: '1.0.0',
+            description: 'API documentation for the backend services.'
         },
         servers: [
             {
@@ -25,16 +30,17 @@ const swaggerOptions = {
         ],
         components: {
             securitySchemes: {
-                BearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT'
+                cookieAuth: {
+                    type: 'apiKey',
+                    in: 'cookie',
+                    name: 'jwt',
+                    description: 'Session-based JWT authentication'
                 }
             }
         },
         security: [
             {
-                BearerAuth: []
+                cookieAuth: []
             }
         ]
     },
