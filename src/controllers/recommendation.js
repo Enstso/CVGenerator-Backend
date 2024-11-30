@@ -170,7 +170,7 @@ module.exports = {
         
         } catch (error) {
             res.status(500).send({
-                message: error.message || 'An error occurred while deleting the recommendation',
+                message: 'An error occurred while deleting the recommendation',
             });
         }
     },

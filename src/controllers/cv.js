@@ -56,7 +56,7 @@ module.exports = {
       });
     } catch (error) {
       res.status(500).send({
-        message: error.message || "An error occurred while retrieving CVs",
+        "An error occurred while retrieving CVs",
       });
     }
   },
@@ -91,7 +91,7 @@ module.exports = {
       });
     } catch (error) {
       res.status(500).send({
-        message: error.message || "An error occurred while retrieving the CV",
+        message: "An error occurred while retrieving the CV",
       });
     }
   },
@@ -159,8 +159,7 @@ module.exports = {
     } catch (error) {
       res.status(500).send({
         message:
-          error.message ||
-          `An error occurred while updating the CV with id=${req.params.id}`,
+          `An error occurred while updating the CV`,
       });
     }
   },
